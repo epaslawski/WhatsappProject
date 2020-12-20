@@ -22,7 +22,7 @@ def read_file(file):
 
 
 if __name__ == '__main__':
-    chat = read_file('_chat.txt')
+    chat = read_file('../_chat.txt')
     len(chat)
 
     join = [line for line in chat if "joined using this" in line]
