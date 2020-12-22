@@ -1,13 +1,9 @@
-
-import pandas as pd
-import numpy as np
+#import pandas as pd
+#import numpy as np
 import re
-import dateparser
+#import dateparser
 from collections import Counter
-
-import matplotlib.pyplot as plt
-plt.style.use('ggplot')
-
+import sys
 
 def read_file(file):
     '''Reads Whatsapp text file into a list of strings'''
@@ -21,31 +17,38 @@ def read_file(file):
     return content
 
 
-if __name__ == '__main__':
-    chat = read_file('../_chat.txt')
-    len(chat)
+def clean_file(unclean_chat):
+    ''' Cleans new lines, status messages, etc'''
+    join = [new_line for new_line in unclean_chat if "joined using this" in new_line]
 
-    join = [line for line in chat if "joined using this" in line]
-
-    #Remove new lines
-    chat = [line.strip() for line in chat]
+    # Remove new lines
+    new_chat = [new_line.strip() for new_line in unclean_chat]
     print("length of chat is:")
     print(len(chat))
 
-    #Clean out the join notification lines
-    clean_chat = [line for line in chat if not "joined using this" in line]
+    # Clean out the join notification lines
+    new_chat = [new_line for new_line in new_chat if not "joined using this" in new_line]
 
-    #Further cleaning
-    #Remove empty lines
-    clean_chat = [line for line in clean_chat if len(line) > 1]
+    # Further cleaning
+    # Remove empty lines
+    new_chat = [new_line for new_line in new_chat if len(new_line) > 1]
     print("length of clean_chat is:")
-    print(len(clean_chat))
+    print(len(new_chat))
 
     # Clean out the left notification lines
-    clean_chat = [line for line in clean_chat if not line.endswith("left")]
+    new_chat = [new_line for new_line in new_chat if not new_line.endswith("left")]
     print("length after removing 'lefts' is:")
     print(len(clean_chat))
 
+    return new_chat
+
+
+if __name__ == '__main__':
+    filename = sys.argv[-1]
+    chat = read_file(filename)
+    len(chat)
+
+    clean_chat = clean_file(chat)
     # Merge messages that belong together
     msgs = []  # message container
     pos = 0  # counter for position of msgs in the container
@@ -58,7 +61,7 @@ if __name__ == '__main__':
 
     for line in clean_chat:
         print(line)
-        if re.findall("\A\d+[-]", line):
+        if re.findall("\d+[-]", line):
             msgs.append(line)
             pos += 1
         else:
